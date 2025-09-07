@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShopX – Modèle E‑commerce (Front + Admin) | HTML/CSS/JS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0d10; --muted:#111319; --panel:#141821; --card:#161b26; --soft:#1b2130; --ring:#2b364d;
+      --primary:#4f8cff; --primary-2:#7aa7ff; --accent:#22c55e; --warning:#f59e0b; --danger:#ef4444;
+      --text:#f1f5f9; --sub:#cbd5e1; --border:#1f2633; --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#0f1220);color:var(--text);font:14px/1.5 "Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+    .container{max-width:1200px;margin:0 auto;padding:24px}
+    header{position:sticky;top:0;z-index:50;background:rgba(15,18,32,.8);backdrop-filter: blur(10px);border-bottom:1px solid var(--border)}
+    .topbar{display:flex;align-items:center;gap:16px;justify-content:space-between;padding:14px 24px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.3px}
+    .brand .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#9b7bff)}
+    nav{display:flex;gap:14px;flex-wrap:wrap}
+    nav a{padding:8px 12px;border-radius:10px;border:1px solid transparent}
+    nav a.active,nav a:hover{border-color:var(--ring);background:var(--muted)}
+    .actions{display:flex;align-items:center;gap:10px}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:1px solid var(--ring);background:var(--panel);box-shadow:var(--shadow);cursor:pointer}
+    .btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary-2));border-color:transparent;color:#0b1020;font-weight:700}
+    .btn.ghost{background:transparent;border-color:var(--ring)}
+    .pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;background:var(--soft);border:1px solid var(--ring);color:var(--sub)}
+    .grid{display:grid;gap:16px}
+    .grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid.cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}
+    @media (max-width:1024px){.grid.cols-4,.grid.cols-5{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:640px){.grid.cols-4,.grid.cols-3,.grid.cols-2,.grid.cols-5{grid-template-columns:1fr}}
+
+    /* Cards */
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:var(--shadow)}
+    .card .body{padding:14px}
+    .price{font-weight:800;font-size:18px}
+    .old{color:var(--sub);text-decoration:line-through;margin-left:8px;font-weight:500}
+    .badge{position:absolute;top:10px;left:10px;background:var(--accent);color:#04110a;padding:6px 8px;font-size:12px;border-radius:10px;font-weight:800}
+    .tag{font-size:12px;color:var(--sub)}
+
+    /* Sections */
+    section{padding:28px 0}
+    .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center}
+    .hero .banner{background:radial-gradient(1200px 300px at 30% -10%,rgba(79,140,255,.25),transparent),linear-gradient(135deg,#0e1420,var(--panel));border:1px solid var(--ring);border-radius:24px;padding:32px;min-height:280px;position:relative;overflow:hidden}
+    .hero h1{font-size:40px;line-height:1.1;margin:0 0 12px}
+    .hero p{color:var(--sub);margin:0 0 18px}
+    .hero .promo{position:absolute;inset:auto 24px 24px auto}
+    .hero .imgwrap{border-radius:24px;overflow:hidden;border:1px solid var(--border);height:100%}
+
+    /* Filters */
+    .filters{display:grid;grid-template-columns:260px 1fr;gap:18px}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:14px}
+    .panel h3{margin:0 0 10px;font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--sub)}
+    .field{display:grid;gap:6px;margin:10px 0}
+    .field input[type="text"], .field input[type="number"], .field select, .field textarea{
+      width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--ring);background:#0e1320;color:var(--text)
+    }
+    .field input[type="range"]{width:100%}
+    .row{display:flex;gap:10px;align-items:center}
+    .row.wrap{flex-wrap:wrap}
+    .chip{padding:6px 10px;border-radius:999px;border:1px solid var(--ring);background:var(--muted);cursor:pointer}
+
+    /* Tables */
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
+    th{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--sub)}
+
+    /* Drawer/Modal */
+    .drawer{position:fixed;inset:0;display:none}
+    .drawer.open{display:block}
+    .drawer .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.5)}
+    .drawer .panel{position:absolute;right:0;top:0;height:100%;width:420px;max-width:100%;overflow:auto}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center}
+    .modal.open{display:flex}
+    .modal .panel{width:min(720px,96%)}
+
+    footer{border-top:1px solid var(--border);background:#0c0f17;color:var(--sub)}
+    footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:18px}
+    @media (max-width:900px){footer .cols{grid-template-columns:1fr 1fr}}
+
+    /* Utility */
+    .hide{display:none!important}
+    .center{display:flex;align-items:center;justify-content:center}
+    .muted{color:var(--sub)}
+    .right{margin-left:auto}
+    .caps{letter-spacing:.08em;text-transform:uppercase}
+    .mb-0{margin-bottom:0}
+    .mb-2{margin-bottom:8px}
+    .mb-3{margin-bottom:12px}
+    .mb-4{margin-bottom:16px}
+    .mb-6{margin-bottom:24px}
+    .mt-2{margin-top:8px}
+    .mt-4{margin-top:16px}
+    .gap-1{gap:6px}
+    .gap-2{gap:10px}
+    .gap-3{gap:16px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand"><span class="dot"></span> ShopX</div>
+      <nav id="main-nav">
+        <a data-route="home" class="active">Accueil</a>
+        <a data-route="catalog">Catalogue</a>
+        <a data-route="cart">Panier <span class="pill" id="cart-count">0</span></a>
+        <a data-route="checkout">Paiement</a>
+        <a data-route="account">Espace Client</a>
+        <a data-route="about">À propos</a>
+        <a data-route="contact">Contact</a>
+        <a data-route="faq">FAQ</a>
+        <a data-route="policies">CGV & Politiques</a>
+        <a class="right" data-route="admin">Admin</a>
+      </nav>
+      <div class="actions">
+        <span class="pill">Devise: XOF</span>
+        <button class="btn ghost" id="themeToggle" title="Theme">🌓</button>
+        <button class="btn primary" data-route="catalog">Explorer</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="app" class="container">
+
+    <!-- Home -->
+    <section id="view-home">
+      <div class="hero">
+        <div class="banner">
+          <span class="pill">Offre spéciale</span>
+          <h1>Découvrez nos meilleures ventes ⚡</h1>
+          <p>Des produits sélectionnés avec soin, livrés partout. Réductions en cours sur une large sélection.</p>
+          <div class="row gap-2">
+            <button class="btn primary" data-route="catalog">Voir le catalogue</button>
+            <button class="btn" data-route="policies">Conditions & retours</button>
+          </div>
+          <div class="promo pill">Jusqu'à -40%</div>
+        </div>
+        <div class="imgwrap">
+          <img alt="Bannière" src="https://images.unsplash.com/photo-1511385348-a52b4a160dc2?q=80&w=1600&auto=format&fit=crop"/>
+        </div>
+      </div>
+
+      <section>
+        <h2 class="mb-3">Produits phares / meilleures ventes</h2>
+        <div class="grid cols-4" id="featured-grid"></div>
+      </section>
+
+      <section>
+        <h2 class="mb-3">Catégories mises en avant</h2>
+        <div class="grid cols-4" id="featured-cats"></div>
+      </section>
+
+      <section>
+        <h2 class="mb-3">Témoignages</h2>
+        <div class="grid cols-3" id="testimonials"></div>
+      </section>
+
+      <section>
+        <h2 class="mb-3">Offres spéciales</h2>
+        <div class="grid cols-4" id="special-offers"></div>
+      </section>
+    </section>
+
+    <!-- Catalogue -->
+    <section id="view-catalog" class="hide">
+      <div class="filters">
+        <aside class="panel">
+          <h3>Filtres</h3>
+          <div class="field"><label>Recherche</label><input id="search" type="text" placeholder="Mot-clé..."></div>
+          <div class="field"><label>Catégorie</label><select id="filter-category"></select></div>
+          <div class="field"><label>Marque</label><select id="filter-brand"></select></div>
+          <div class="field"><label class="row">Prix max: <span id="priceMaxLabel" class="right">—</span></label>
+            <input id="priceMax" type="range" min="0" max="500000" step="1000" value="500000"></div>
+          <div class="field row wrap">
+            <label class="chip"><input id="only-available" type="checkbox"> Disponible</label>
+            <label class="chip"><input id="only-new" type="checkbox"> Nouveautés</label>
+          </div>
+          <button class="btn" id="resetFilters">Réinitialiser</button>
+        </aside>
+        <div>
+          <div class="row gap-2 mb-3">
+            <div class="pill">Résultats: <span id="resultsCount">0</span></div>
+            <div class="right row gap-2">
+              <label class="pill">Trier par 
+                <select id="sortBy" style="background:transparent;border:0;color:var(--text)">
+                  <option value="popular">Popularité</option>
+                  <option value="price-asc">Prix ↑</option>
+                  <option value="price-desc">Prix ↓</option>
+                  <option value="new">Nouveautés</option>
+                </select>
+              </label>
+              <label class="pill">Affichage
+                <select id="perPage" style="background:transparent;border:0;color:var(--text)">
+                  <option>8</option><option>16</option><option>24</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="grid cols-4" id="catalog-grid"></div>
+          <div class="row center mt-4 gap-2" id="pagination"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Détail Produit -->
+    <section id="view-product" class="hide">
+      <div class="grid cols-2" id="product-detail"></div>
+      <div class="mt-4">
+        <h3>Produits similaires</h3>
+        <div class="grid cols-4" id="related-grid"></div>
+      </div>
+    </section>
+
+    <!-- Panier -->
+    <section id="view-cart" class="hide">
+      <div class="grid cols-2">
+        <div class="panel">
+          <h3>Votre panier</h3>
+          <div id="cart-items"></div>
+        </div>
+        <div class="panel">
+          <h3>Résumé</h3>
+          <div id="cart-summary"></div>
+          <div class="mt-4 row gap-2">
+            <button class="btn" data-route="catalog">Continuer vos achats</button>
+            <button class="btn primary" data-route="checkout">Commander</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Checkout -->
+    <section id="view-checkout" class="hide">
+      <div class="grid cols-2">
+        <form class="panel" id="checkout-form">
+          <h3>Adresse de livraison</h3>
+          <div class="grid cols-2">
+            <div class="field"><label>Prénom</label><input required name="firstname"></div>
+            <div class="field"><label>Nom</label><input required name="lastname"></div>
+          </div>
+          <div class="field"><label>Adresse</label><input required name="address"></div>
+          <div class="grid cols-3">
+            <div class="field"><label>Ville</label><input required name="city"></div>
+            <div class="field"><label>Pays</label><input required name="country" value="Sénégal"></div>
+            <div class="field"><label>Téléphone</label><input required name="phone"></div>
+          </div>
+          <h3 class="mt-4">Livraison</h3>
+          <div class="field">
+            <select name="shipping" id="shipping">
+              <option value="standard">Standard (2‑5 j) – 2 000 XOF</option>
+              <option value="express">Express (24‑48h) – 5 000 XOF</option>
+            </select>
+          </div>
+          <h3 class="mt-4">Paiement</h3>
+          <div class="field">
+            <select name="payment">
+              <option value="card">Carte bancaire</option>
+              <option value="paypal">PayPal</option>
+              <option value="mobilemoney">Mobile Money</option>
+            </select>
+          </div>
+          <button class="btn primary mt-4" type="submit">Valider & payer</button>
+        </form>
+        <div class="panel">
+          <h3>Récapitulatif</h3>
+          <div id="checkout-summary"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Compte client -->
+    <section id="view-account" class="hide">
+      <div class="grid cols-2">
+        <aside class="panel">
+          <h3>Mon compte</h3>
+          <div class="row wrap gap-2">
+            <button class="btn ghost" data-account-tab="dashboard">Tableau de bord</button>
+            <button class="btn ghost" data-account-tab="profile">Informations personnelles</button>
+            <button class="btn ghost" data-account-tab="orders">Historique des commandes</button>
+            <button class="btn ghost" data-account-tab="tracking">Suivi de livraison</button>
+            <button class="btn ghost" data-account-tab="addresses">Adresses</button>
+            <button class="btn ghost" data-account-tab="payments">Moyens de paiement</button>
+            <button class="btn" id="logoutBtn">Déconnexion</button>
+          </div>
+        </aside>
+        <div class="panel" id="account-content"></div>
+      </div>
+    </section>
+
+    <!-- Pages statiques -->
+    <section id="view-about" class="hide panel"><h3>À propos</h3><p>Qui sommes‑nous, mission, valeurs, équipe, partenaires.</p></section>
+    <section id="view-contact" class="hide panel">
+      <h3>Contact</h3>
+      <form id="contact-form" class="grid cols-2">
+        <div class="field"><label>Nom</label><input required></div>
+        <div class="field"><label>Email</label><input type="email" required></div>
+        <div class="field" style="grid-column:1 / -1"><label>Message</label><textarea rows="5" required></textarea></div>
+        <button class="btn primary" type="submit">Envoyer</button>
+      </form>
+    </section>
+    <section id="view-faq" class="hide panel"><h3>FAQ</h3><p>Questions fréquentes (livraison, retours, paiement…)</p></section>
+    <section id="view-policies" class="hide panel">
+      <h3>Conditions générales & politiques</h3>
+      <ul>
+        <li>CGV</li>
+        <li>Politique de confidentialité (RGPD)</li>
+        <li>Politique de retour & remboursement</li>
+      </ul>
+    </section>
+
+    <!-- Admin -->
+    <section id="view-admin" class="hide">
+      <div class="grid cols-2">
+        <aside class="panel">
+          <h3>Administration</h3>
+          <div class="row wrap gap-2">
+            <button class="btn ghost" data-admin-tab="dashboard">Dashboard</button>
+            <button class="btn ghost" data-admin-tab="products">Produits</button>
+            <button class="btn ghost" data-admin-tab="categories">Catégories</button>
+            <button class="btn ghost" data-admin-tab="orders">Commandes</button>
+            <button class="btn ghost" data-admin-tab="customers">Clients</button>
+            <button class="btn ghost" data-admin-tab="payments">Paiements & Livraisons</button>
+            <button class="btn ghost" data-admin-tab="promos">Promotions</button>
+            <button class="btn ghost" data-admin-tab="content">Contenu</button>
+            <button class="btn ghost" data-admin-tab="settings">Paramètres & Sécurité</button>
+            <button class="btn ghost" data-admin-tab="backups">Sauvegardes & Logs</button>
+          </div>
+        </aside>
+        <div class="panel" id="admin-content"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="cols">
+        <div>
+          <div class="brand mb-2"><span class="dot"></span> ShopX</div>
+          <p class="muted">Boutique démo – HTML/CSS/JS pur. Prête à être branchée à un backend.</p>
+        </div>
+        <div>
+          <h4>Liens</h4>
+          <a data-route="about">À propos</a><br/>
+          <a data-route="contact">Contact</a><br/>
+          <a data-route="faq">FAQ</a>
+        </div>
+        <div>
+          <h4>Légal</h4>
+          <a data-route="policies">CGV</a><br/>
+          <a data-route="policies">Confidentialité</a><br/>
+          <a data-route="policies">Retours</a>
+        </div>
+        <div>
+          <h4>Suivez‑nous</h4>
+          <div class="row gap-2"><span class="pill">Facebook</span><span class="pill">Instagram</span><span class="pill">X</span></div>
+        </div>
+      </div>
+      <div class="center" style="padding:16px 0;border-top:1px solid var(--border);margin-top:16px">© 2025 ShopX</div>
+    </div>
+  </footer>
+
+  <!-- Cart drawer (mobile quick view) -->
+  <div class="drawer" id="drawer-cart">
+    <div class="backdrop" data-close="drawer"></div>
+    <div class="panel">
+      <div class="topbar"><strong>Panier</strong><button class="btn" data-close="drawer">Fermer</button></div>
+      <div class="body" id="drawer-cart-items"></div>
+    </div>
+  </div>
+
+  <!-- Generic modal -->
+  <div class="modal" id="modal">
+    <div class="panel">
+      <div class="topbar"><strong id="modal-title">Titre</strong><button class="btn" data-close="modal">Fermer</button></div>
+      <div class="body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+    // --- Démo data ---
+    const state = {
+      products: [
+        {id:1,name:"Casque Sans Fil Alpha",price:45000,oldPrice:60000,brand:"Sonic",category:"Audio",stock:12,new:true,featured:true,img:"https://images.unsplash.com/photo-1518443952241-07e5f5f0c4a9?q=80&w=1200&auto=format&fit=crop"},
+        {id:2,name:"Montre Connectée FitX",price:35000,brand:"Pulse",category:"Wearables",stock:0,new:true,featured:true,img:"https://images.unsplash.com/photo-1516726817505-f5ed825624d8?q=80&w=1200&auto=format&fit=crop"},
+        {id:3,name:"Clavier Mécanique Pro",price:55000,brand:"KeyPro",category:"Informatique",stock:23,featured:true,img:"https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop"},
+        {id:4,name:"Chaussures Running Air",price:42000,oldPrice:52000,brand:"RunX",category:"Sport",stock:8,img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop"},
+        {id:5,name:"Sac à Dos Urbain",price:28000,brand:"Urban",category:"Mode",stock:40,new:true,img:"https://images.unsplash.com/photo-1520975693416-35a019fbd556?q=80&w=1200&auto=format&fit=crop"},
+        {id:6,name:"Appareil Photo Compact Z",price:230000,brand:"Photon",category:"Photo",stock:4,img:"https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1200&auto=format&fit=crop"},
+        {id:7,name:"T‑Shirt Coton Premium",price:9000,brand:"Cloth",category:"Mode",stock:100,img:"https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=1200&auto=format&fit=crop"},
+        {id:8,name:"Mixeur de Cuisine Pro",price:65000,brand:"KitchenX",category:"Maison",stock:15,img:"https://images.unsplash.com/photo-1556910096-6f5e72db6809?q=80&w=1200&auto=format&fit=crop"},
+        {id:9,name:"Smartphone Nova",price:290000,oldPrice:320000,brand:"Novax",category:"Informatique",stock:9,new:true,img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=1200&auto=format&fit=crop"},
+        {id:10,name:"Enceinte Bluetooth Mini",price:20000,brand:"Sonic",category:"Audio",stock:3,img:"https://images.unsplash.com/photo-1492551557933-34265f7af79e?q=80&w=1200&auto=format&fit=crop"},
+        {id:11,name:"Ballon de Football Pro",price:15000,brand:"RunX",category:"Sport",stock:0,img:"https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=1200&auto=format&fit=crop"},
+        {id:12,name:"Lampe de Bureau LED",price:12000,brand:"Homey",category:"Maison",stock:25,img:"https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=1200&auto=format&fit=crop"}
+      ],
+      categories:["Audio","Wearables","Informatique","Sport","Mode","Photo","Maison"],
+      brands:["Sonic","Pulse","KeyPro","RunX","Urban","Photon","Cloth","KitchenX","Novax","Homey"],
+      cart: JSON.parse(localStorage.getItem('cart')||'[]'),
+      orders: JSON.parse(localStorage.getItem('orders')||'[]'),
+      customers:[{id:1,name:"Awa Diop",email:"awa@example.com",blocked:false,orders:2},{id:2,name:"Moussa Ndiaye",email:"moussa@example.com",blocked:false,orders:1}],
+      testimonials:[
+        {name:"Awa D.",text:"Livraison rapide et produit conforme !"},
+        {name:"Karim S.",text:"Support réactif, je recommande."},
+        {name:"Fatou B.",text:"Très bon rapport qualité/prix."}
+      ],
+      coupon:null,
+    };
+
+    const VAT = 0.18; // 18% TVA démo
+
+    // --- Helpers ---
+    const fmt = n => new Intl.NumberFormat('fr-FR', {style:'currency', currency:'XOF', maximumFractionDigits:0}).format(n);
+    const el = (html) => { const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
+    const byId = id => document.getElementById(id);
+
+    function saveCart(){ localStorage.setItem('cart', JSON.stringify(state.cart)); updateCartCount(); }
+    function addToCart(id,qty=1){ const p=state.products.find(p=>p.id===id); if(!p||p.stock<=0) return; const line=state.cart.find(l=>l.id===id); if(line){ line.qty=Math.min(line.qty+qty,p.stock);} else { state.cart.push({id,qty}); } saveCart(); toast(`Ajouté au panier: ${p.name}`); }
+    function removeFromCart(id){ state.cart=state.cart.filter(l=>l.id!==id); saveCart(); renderCart(); }
+    function updateQty(id,qty){ const p=state.products.find(p=>p.id===id); const line=state.cart.find(l=>l.id===id); if(!line) return; line.qty=Math.max(1, Math.min(qty,p.stock)); saveCart(); renderCartSummary(); renderCheckoutSummary(); }
+    function cartItems(){ return state.cart.map(l=>({ ...state.products.find(p=>p.id===l.id), qty:l.qty })); }
+    function totals(){ const items=cartItems(); const subtotal=items.reduce((s,i)=>s+i.price*i.qty,0); const tva = Math.round(subtotal*VAT); const shipping = (byId('shipping') && byId('shipping').value==='express')?5000:(items.length?2000:0); const total=subtotal+tva+shipping; return {items,subtotal,tva,shipping,total}; }
+
+    function toast(msg){ // simple toast using modal
+      const m=byId('modal'); byId('modal-title').textContent='Info'; byId('modal-body').innerHTML=`<p>${msg}</p>`; m.classList.add('open'); setTimeout(()=>m.classList.remove('open'),1200);
+    }
+
+    // --- Routing ---
+    const views = ['home','catalog','product','cart','checkout','account','about','contact','faq','policies','admin'];
+    function showView(name){ views.forEach(v=> byId(`view-${v}`).classList.toggle('hide', v!==name)); document.querySelectorAll('nav a').forEach(a=> a.classList.toggle('active', a.dataset.route===name)); window.scrollTo({top:0,behavior:'smooth'}); }
+    function navigate(route){
+      const [name, param] = route.split('/');
+      if(!views.includes(name)) return;
+      showView(name);
+      if(name==='catalog') renderCatalog();
+      if(name==='product') renderProduct(+param);
+      if(name==='cart') renderCart();
+      if(name==='checkout') { renderCheckoutSummary(); }
+      if(name==='account') renderAccount('dashboard');
+      if(name==='admin') renderAdmin('dashboard');
+      location.hash = `#${route}`;
+    }
+
+    // --- Home render ---
+    function renderHome(){
+      const f=state.products.filter(p=>p.featured).slice(0,8);
+      byId('featured-grid').innerHTML = f.map(cardProduct).join('');
+      byId('featured-cats').innerHTML = state.categories.map(c=>`<div class="card"><div class="body"><div class="row"><strong>${c}</strong><span class="tag right">Voir</span></div><div class="mt-2"><button class="btn" onclick="setCategory('${c}')">Explorer</button></div></div></div>`).join('');
+      byId('testimonials').innerHTML = state.testimonials.map(t=>`<div class="card"><div class="body"><p>“${t.text}”</p><div class="row mt-2"><span class="pill">${t.name}</span><span class="right tag">★★★★★</span></div></div></div>`).join('');
+      byId('special-offers').innerHTML = state.products.filter(p=>p.oldPrice).map(cardProduct).join('');
+    }
+
+    function cardProduct(p){
+      const badge = p.new?'<span class="badge">Nouveau</span>':'';
+      const old = p.oldPrice?`<span class="old">${fmt(p.oldPrice)}</span>`:'';
+      const stock = p.stock>0?'<span class="pill">En stock</span>':'<span class="pill" style="background:#341922;color:#fda4af">Rupture</span>';
+      return `<div class="card"><div style="position:relative"><img src="${p.img}" alt="${p.name}">${badge}</div>
+        <div class="body">
+          <div class="row"><strong>${p.name}</strong><span class="tag right">${p.brand}</span></div>
+          <div class="row mt-2"><span class="price">${fmt(p.price)}</span>${old}<span class="right">${stock}</span></div>
+          <div class="row mt-2 gap-2">
+            <button class="btn" onclick="addToCart(${p.id})">Ajouter</button>
+            <button class="btn ghost" onclick="navigate('product/${p.id}')">Voir</button>
+          </div>
+        </div></div>`;
+    }
+
+    // --- Catalog ---
+    function setCategory(c){ byId('filter-category').value=c; navigate('catalog'); renderCatalog(); }
+    function renderCatalog(){
+      // init selects
+      const catSel=byId('filter-category'); const brandSel=byId('filter-brand');
+      if(!catSel.options.length){ catSel.innerHTML = '<option value="">Toutes</option>' + state.categories.map(c=>`<option>${c}</option>`).join(''); }
+      if(!brandSel.options.length){ brandSel.innerHTML = '<option value="">Toutes</option>' + state.brands.map(b=>`<option>${b}</option>`).join(''); }
+      const search = byId('search').value.toLowerCase();
+      const cat = catSel.value; const brand = brandSel.value; const priceMax = +byId('priceMax').value; byId('priceMaxLabel').textContent = fmt(priceMax);
+      const onlyAvail = byId('only-available').checked; const onlyNew = byId('only-new').checked;
+      const sort = byId('sortBy').value; const perPage = +byId('perPage').value;
+
+      let list = state.products.filter(p=>
+        (!cat || p.category===cat) && (!brand || p.brand===brand) && p.price<=priceMax && (!onlyAvail || p.stock>0) && (!onlyNew || p.new) && (!search || p.name.toLowerCase().includes(search))
+      );
+      if(sort==='price-asc') list.sort((a,b)=>a.price-b.price);
+      if(sort==='price-desc') list.sort((a,b)=>b.price-a.price);
+      if(sort==='new') list.sort((a,b)=> (b.new?1:0)-(a.new?1:0));
+
+      byId('resultsCount').textContent = list.length;
+      // pagination
+      const page = +new URLSearchParams(location.search).get('p') || 1;
+      const pages = Math.max(1, Math.ceil(list.length/perPage));
+      const start = (page-1)*perPage; const current = list.slice(start,start+perPage);
+      byId('catalog-grid').innerHTML = current.map(cardProduct).join('');
+      byId('pagination').innerHTML = Array.from({length:pages},(_,i)=>`<button class="btn ${i+1===page?'primary':''}" onclick="setPage(${i+1})">${i+1}</button>`).join('');
+    }
+    function setPage(p){ const url = new URL(location); url.searchParams.set('p',p); history.replaceState(null,'',url); renderCatalog(); }
+
+    // --- Product detail ---
+    function renderProduct(id){
+      const p = state.products.find(p=>p.id===id); if(!p){ byId('product-detail').innerHTML='<p>Produit introuvable.</p>'; return; }
+      byId('product-detail').innerHTML = `
+        <div class="card"><img src="${p.img}" alt="${p.name}"></div>
+        <div class="panel">
+          <h2 class="mb-0">${p.name}</h2>
+          <div class="tag mb-3">${p.brand} • ${p.category}</div>
+          <div class="row gap-2 mb-3"><span class="price">${fmt(p.price)}</span>${p.oldPrice?`<span class='old'>${fmt(p.oldPrice)}</span>`:''}</div>
+          <p class="muted">Description détaillée du produit: caractéristiques, matériaux, garantie, etc.</p>
+          <div class="row gap-2 mt-4">
+            <button class="btn" onclick="addToCart(${p.id})">Ajouter au panier</button>
+            <span class="pill">${p.stock>0?`En stock (${p.stock})`:'Rupture'}</span>
+          </div>
+          <div class="mt-4">
+            <h4>Avis & notes</h4>
+            <p class="muted">⭐️⭐️⭐️⭐️☆ (124 avis)</p>
+          </div>
+        </div>`;
+      // related
+      const related = state.products.filter(x=>x.category===p.category && x.id!==p.id).slice(0,4);
+      byId('related-grid').innerHTML = related.map(cardProduct).join('');
+    }
+
+    // --- Cart ---
+    function updateCartCount(){ byId('cart-count').textContent = state.cart.reduce((s,l)=>s+l.qty,0); }
+    function renderCart(){
+      const items = cartItems();
+      if(!items.length){ byId('cart-items').innerHTML='<p>Votre panier est vide.</p>'; byId('cart-summary').innerHTML=''; return; }
+      byId('cart-items').innerHTML = items.map(i=>`<div class='row mb-3'>
+        <img src='${i.img}' alt='' style='width:72px;height:72px;object-fit:cover;border-radius:12px;border:1px solid var(--border)'>
+        <div class='right' style='flex:1'>
+          <div class='row'><strong>${i.name}</strong><span class='tag right'>${fmt(i.price)}</span></div>
+          <div class='row mt-2 gap-2'>
+            <label class='pill'>Qté <input type='number' min='1' max='${i.stock}' value='${i.qty}' style='width:64px;background:transparent;border:0;color:var(--text)' onchange='updateQty(${i.id},+this.value)'></label>
+            <button class='btn' onclick='removeFromCart(${i.id})'>Supprimer</button>
+          </div>
+        </div>
+      </div>`).join('');
+      renderCartSummary();
+    }
+    function renderCartSummary(){ const t=totals(); byId('cart-summary').innerHTML = `
+      <div class='row'><span>Sous‑total</span><strong class='right'>${fmt(t.subtotal)}</strong></div>
+      <div class='row'><span>TVA (18%)</span><span class='right'>${fmt(t.tva)}</span></div>
+      <div class='row'><span>Livraison</span><span class='right'>${fmt(t.shipping)}</span></div>
+      <hr style='border-color:var(--border)'>
+      <div class='row'><span>Total</span><strong class='right'>${fmt(t.total)}</strong></div>`; }
+
+    // --- Checkout ---
+    function renderCheckoutSummary(){ const t=totals(); byId('checkout-summary').innerHTML = `
+      <div>${t.items.map(i=>`<div class='row'><span>${i.name} × ${i.qty}</span><span class='right'>${fmt(i.price*i.qty)}</span></div>`).join('')}</div>
+      <hr style='border-color:var(--border)'>
+      <div class='row'><span>Sous‑total</span><span class='right'>${fmt(t.subtotal)}</span></div>
+      <div class='row'><span>TVA</span><span class='right'>${fmt(t.tva)}</span></div>
+      <div class='row'><span>Livraison</span><span class='right'>${fmt(t.shipping)}</span></div>
+      <div class='row'><strong>Total</strong><strong class='right'>${fmt(t.total)}</strong></div>`; }
+
+    byId('checkout-form').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      if(!state.cart.length) return toast('Votre panier est vide');
+      const form = Object.fromEntries(new FormData(e.target).entries());
+      const t=totals();
+      const orderId = Math.random().toString(36).slice(2,8).toUpperCase();
+      const order = {id:orderId,date:new Date().toISOString(),items:cartItems(),total:t.total,status:'payée',shipping:form.shipping,payment:form.payment,customer:form.firstname+" "+form.lastname,address:form.address};
+      state.orders.unshift(order); localStorage.setItem('orders', JSON.stringify(state.orders));
+      state.cart=[]; saveCart(); renderCheckoutSummary(); renderCart();
+      byId('modal-title').textContent='Commande confirmée'; byId('modal-body').innerHTML = `<p>Merci ! Votre commande <strong>#${orderId}</strong> est confirmée.</p>`; byId('modal').classList.add('open');
+      navigate('account'); renderAccount('orders');
+    });
+
+    // --- Account ---
+    function renderAccount(tab){ const box=byId('account-content');
+      if(tab==='dashboard') box.innerHTML = `<h3>Tableau de bord</h3><p class='muted'>Bienvenue dans votre espace client.</p>`;
+      if(tab==='profile') box.innerHTML = `<h3>Profil</h3><div class='grid cols-2'><div class='field'><label>Nom</label><input value='Client Démo'></div><div class='field'><label>Email</label><input value='client@example.com'></div><button class='btn primary'>Enregistrer</button></div>`;
+      if(tab==='orders') box.innerHTML = `<h3>Mes commandes</h3>${state.orders.length? `<table><thead><tr><th>ID</th><th>Date</th><th>Total</th><th>Statut</th></tr></thead><tbody>`+state.orders.map(o=>`<tr><td><a href='#' onclick='openOrder("${o.id}")'>#${o.id}</a></td><td>${new Date(o.date).toLocaleString('fr-FR')}</td><td>${fmt(o.total)}</td><td>${o.status}</td></tr>`).join('')+`</tbody></table>` : '<p>Aucune commande.</p>'}`;
+      if(tab==='tracking') box.innerHTML = `<h3>Suivi</h3><p class='muted'>Suivez vos colis (démo).</p>`;
+      if(tab==='addresses') box.innerHTML = `<h3>Adresses</h3><div class='field'><label>Adresse</label><input value='Dakar, SN'></div><button class='btn'>Ajouter</button>`;
+      if(tab==='payments') box.innerHTML = `<h3>Paiements</h3><p class='muted'>Enregistrez vos cartes / Mobile Money.</p>`;
+      document.querySelectorAll('[data-account-tab]').forEach(b=> b.onclick=()=>{ renderAccount(b.dataset.accountTab); });
+    }
+    function openOrder(id){ const o=state.orders.find(x=>x.id===id); if(!o) return; byId('modal-title').textContent=`Commande #${id}`; byId('modal-body').innerHTML = `
+      <div class='row'><span>Date</span><span class='right'>${new Date(o.date).toLocaleString('fr-FR')}</span></div>
+      <div class='row'><span>Statut</span><span class='right'>${o.status}</span></div>
+      <hr style='border-color:var(--border)'>
+      ${o.items.map(i=>`<div class='row'><span>${i.name} × ${i.qty}</span><span class='right'>${fmt(i.price*i.qty)}</span></div>`).join('')}
+      <hr style='border-color:var(--border)'>
+      <div class='row'><strong>Total</strong><strong class='right'>${fmt(o.total)}</strong></div>`; byId('modal').classList.add('open'); }
+
+    // --- Admin ---
+    function renderAdmin(tab){ const box=byId('admin-content');
+      if(tab==='dashboard') box.innerHTML = `
+        <h3>Vue globale</h3>
+        <div class='grid cols-3'>
+          <div class='card'><div class='body'><div class='caps muted mb-2'>Ventes du jour</div><div class='price'>${fmt(1200000)}</div></div></div>
+          <div class='card'><div class='body'><div class='caps muted mb-2'>Commandes en attente</div><div class='price'>3</div></div></div>
+          <div class='card'><div class='body'><div class='caps muted mb-2'>Produits en rupture</div><div class='price'>${state.products.filter(p=>p.stock===0).length}</div></div></div>
+        </div>
+        <h3 class='mt-4'>Statistiques</h3>
+        <p class='muted'>Graphiques à brancher (démo).</p>`;
+
+      if(tab==='products') box.innerHTML = `
+        <div class='row'><h3>Produits</h3><button class='btn right' onclick='openProductForm()'>Ajouter</button></div>
+        <table><thead><tr><th>ID</th><th>Nom</th><th>Catégorie</th><th>Marque</th><th>Prix</th><th>Stock</th><th></th></tr></thead><tbody>
+        ${state.products.map(p=>`<tr><td>${p.id}</td><td>${p.name}</td><td>${p.category}</td><td>${p.brand}</td><td>${fmt(p.price)}</td><td>${p.stock}</td><td><button class='btn' onclick='editProduct(${p.id})'>Modifier</button></td></tr>`).join('')}
+        </tbody></table>
+        <div class='row mt-4 gap-2'><button class='btn'>Import CSV</button><button class='btn'>Export CSV</button></div>`;
+
+      if(tab==='categories') box.innerHTML = `
+        <div class='row'><h3>Catégories</h3><button class='btn right' onclick='openCategories()'>Gérer</button></div>
+        <ul>${state.categories.map(c=>`<li>${c}</li>`).join('')}</ul>`;
+
+      if(tab==='orders') box.innerHTML = `
+        <h3>Commandes</h3>
+        ${state.orders.length? `<table><thead><tr><th>ID</th><th>Date</th><th>Total</th><th>Statut</th><th></th></tr></thead><tbody>`+state.orders.map(o=>`<tr><td>#${o.id}</td><td>${new Date(o.date).toLocaleString('fr-FR')}</td><td>${fmt(o.total)}</td><td>${o.status}</td><td><button class='btn' onclick='manageOrder("${o.id}")'>Gérer</button></td></tr>`).join('')+`</tbody></table>` : '<p>Aucune commande.</p>'}`;
+
+      if(tab==='customers') box.innerHTML = `
+        <h3>Clients</h3>
+        <table><thead><tr><th>ID</th><th>Nom</th><th>Email</th><th>Achats</th><th>Statut</th><th></th></tr></thead><tbody>
+        ${state.customers.map(c=>`<tr><td>${c.id}</td><td>${c.name}</td><td>${c.email}</td><td>${c.orders}</td><td>${c.blocked?'Bloqué':'OK'}</td><td><button class='btn' onclick='toggleBlock(${c.id})'>${c.blocked?'Débloquer':'Bloquer'}</button></td></tr>`).join('')}
+        </tbody></table>`;
+
+      if(tab==='payments') box.innerHTML = `
+        <h3>Paiements & Livraisons</h3>
+        <div class='grid cols-2'>
+          <div class='panel'><h3>Moyens de paiement</h3><label class='chip'><input type='checkbox' checked> Carte</label> <label class='chip'><input type='checkbox' checked> PayPal</label> <label class='chip'><input type='checkbox' checked> Mobile Money</label></div>
+          <div class='panel'><h3>Transporteurs</h3><div class='field'><label>Frais standard</label><input value='2000'></div><div class='field'><label>Frais express</label><input value='5000'></div></div>
+        </div>`;
+
+      if(tab==='promos') box.innerHTML = `
+        <h3>Promotions</h3>
+        <div class='row gap-2'>
+          <input id='couponCode' placeholder='Code promo' class='pill' style='background:transparent;border:1px solid var(--ring);padding:10px'>
+          <button class='btn' onclick='applyCouponAdmin()'>Appliquer</button>
+        </div>
+        <p class='muted mt-2'>Réductions par produit/catégorie à implémenter côté serveur.</p>`;
+
+      if(tab==='content') box.innerHTML = `
+        <h3>Contenu</h3>
+        <div class='grid cols-2'>
+          <div class='panel'><h3>Pages statiques</h3><button class='btn'>Éditer</button></div>
+          <div class='panel'><h3>Bannières</h3><button class='btn'>Gérer</button></div>
+        </div>`;
+
+      if(tab==='settings') box.innerHTML = `
+        <h3>Paramètres & Sécurité</h3>
+        <div class='grid cols-2'>
+          <div class='panel'>
+            <h3>Administrateurs</h3>
+            <table><thead><tr><th>Utilisateur</th><th>Rôle</th><th></th></tr></thead><tbody>
+              <tr><td>admin@shopx.local</td><td>Super Admin</td><td><button class='btn'>Modifier</button></td></tr>
+            </tbody></table>
+          </div>
+          <div class='panel'>
+            <h3>Site</h3>
+            <div class='field'><label>Nom</label><input value='ShopX'></div>
+            <div class='field'><label>Devise</label><input value='XOF'></div>
+            <div class='field'><label>Langues</label><input value='fr'></div>
+            <button class='btn'>Enregistrer</button>
+          </div>
+        </div>`;
+
+      if(tab==='backups') box.innerHTML = `
+        <h3>Sauvegardes & logs</h3>
+        <div class='row gap-2'><button class='btn'>Créer une sauvegarde</button><button class='btn'>Télécharger logs</button></div>`;
+
+      document.querySelectorAll('[data-admin-tab]').forEach(b=> b.onclick=()=>{ renderAdmin(b.dataset.adminTab); });
+    }
+
+    function openProductForm(){ byId('modal-title').textContent='Nouveau produit'; byId('modal-body').innerHTML = `
+      <div class='grid cols-2'>
+        <div class='field'><label>Nom</label><input id='p-name'></div>
+        <div class='field'><label>Prix</label><input id='p-price' type='number'></div>
+        <div class='field'><label>Catégorie</label><input id='p-cat'></div>
+        <div class='field'><label>Marque</label><input id='p-brand'></div>
+        <div class='field'><label>Stock</label><input id='p-stock' type='number'></div>
+        <div class='field'><label>Image URL</label><input id='p-img'></div>
+      </div>
+      <button class='btn primary mt-4' onclick='createProduct()'>Ajouter</button>`; byId('modal').classList.add('open'); }
+    function createProduct(){ const p={id:Math.max(...state.products.map(p=>p.id))+1,name:byId('p-name').value,price:+byId('p-price').value,category:byId('p-cat').value,brand:byId('p-brand').value,stock:+byId('p-stock').value,img:byId('p-img').value||'https://picsum.photos/800'}; state.products.push(p); byId('modal').classList.remove('open'); renderAdmin('products'); toast('Produit ajouté'); }
+    function editProduct(id){ const p=state.products.find(x=>x.id===id); if(!p) return; byId('modal-title').textContent='Modifier produit'; byId('modal-body').innerHTML = `
+      <div class='grid cols-2'>
+        <div class='field'><label>Nom</label><input id='p-name' value='${p.name}'></div>
+        <div class='field'><label>Prix</label><input id='p-price' type='number' value='${p.price}'></div>
+        <div class='field'><label>Catégorie</label><input id='p-cat' value='${p.category}'></div>
+        <div class='field'><label>Marque</label><input id='p-brand' value='${p.brand}'></div>
+        <div class='field'><label>Stock</label><input id='p-stock' type='number' value='${p.stock}'></div>
+        <div class='field'><label>Image URL</label><input id='p-img' value='${p.img}'></div>
+      </div>
+      <button class='btn primary mt-4' onclick='saveProduct(${id})'>Enregistrer</button>`; byId('modal').classList.add('open'); }
+    function saveProduct(id){ const p=state.products.find(x=>x.id===id); if(!p) return; p.name=byId('p-name').value; p.price=+byId('p-price').value; p.category=byId('p-cat').value; p.brand=byId('p-brand').value; p.stock=+byId('p-stock').value; p.img=byId('p-img').value; byId('modal').classList.remove('open'); renderAdmin('products'); toast('Produit mis à jour'); }
+
+    function openCategories(){ byId('modal-title').textContent='Gestion des catégories'; byId('modal-body').innerHTML = `
+      <div id='cat-list'>${state.categories.map(c=>`<div class='row mb-2'><span>${c}</span><button class='btn right' onclick='delCat("${c}")'>Supprimer</button></div>`).join('')}</div>
+      <div class='row mt-2 gap-2'><input id='new-cat' placeholder='Nouvelle catégorie' class='pill' style='background:transparent;border:1px solid var(--ring);padding:10px'><button class='btn' onclick='addCat()'>Ajouter</button></div>`; byId('modal').classList.add('open'); }
+    function addCat(){ const v=byId('new-cat').value.trim(); if(!v) return; state.categories.push(v); openCategories(); }
+    function delCat(c){ state.categories = state.categories.filter(x=>x!==c); openCategories(); }
+
+    function manageOrder(id){ const o=state.orders.find(x=>x.id===id); if(!o) return; byId('modal-title').textContent=`Commande #${id}`; byId('modal-body').innerHTML = `
+      <div class='row'><span>Statut</span>
+        <select id='order-status' class='right' style='background:transparent;border:1px solid var(--ring);color:var(--text)'>
+          ${['en attente','payée','expédiée','livrée','annulée'].map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class='mt-2'>${o.items.map(i=>`<div class='row'><span>${i.name} × ${i.qty}</span><span class='right'>${fmt(i.price*i.qty)}</span></div>`).join('')}</div>
+      <div class='row mt-3 gap-2'>
+        <button class='btn' onclick='printInvoice("${id}")'>Imprimer facture</button>
+        <button class='btn primary' onclick='saveOrder("${id}")'>Enregistrer</button>
+      </div>`; byId('modal').classList.add('open'); }
+    function saveOrder(id){ const o=state.orders.find(x=>x.id===id); if(!o) return; o.status = byId('order-status').value; localStorage.setItem('orders', JSON.stringify(state.orders)); toast('Commande mise à jour'); byId('modal').classList.remove('open'); renderAdmin('orders'); }
+    function printInvoice(id){ const o=state.orders.find(x=>x.id===id); if(!o) return; const win=window.open('','invoice'); win.document.write(`<pre>Facture #${id}\nClient: ${o.customer}\nTotal: ${fmt(o.total)}\nMerci pour votre achat.</pre>`); win.print(); }
+
+    function toggleBlock(id){ const c=state.customers.find(x=>x.id===id); c.blocked=!c.blocked; renderAdmin('customers'); }
+    function applyCouponAdmin(){ const code=byId('couponCode').value.trim(); state.coupon=code||null; toast(`Code ${code?code:'retiré'}`); }
+
+    // UI global
+    document.querySelectorAll('nav [data-route], .actions [data-route], [data-route]')
+      .forEach(a=> a.addEventListener('click', e=>{ const r=a.dataset.route; if(r){ e.preventDefault(); navigate(r); }}));
+
+    document.querySelectorAll('[data-close="drawer"]').forEach(b=> b.onclick=()=> byId('drawer-cart').classList.remove('open'));
+    document.querySelectorAll('[data-close="modal"]').forEach(b=> b.onclick=()=> byId('modal').classList.remove('open'));
+
+    // Filters
+    document.querySelectorAll('[data-filter]').forEach(b=> b.onclick=()=>{ state.filter=b.dataset.filter; render(); });
+    document.querySelectorAll('[data-order]').forEach(b=> b.onclick=()=>{ state.order=b.dataset.order; render(); });
+    document.querySelectorAll('[data-sort]').forEach(b=> b.onclick=()=>{ state.sort=b.dataset.sort; render(); });
+    byId('priceMax').addEventListener('input', renderCatalog);
+    byId('filter-category').addEventListener('change', renderCatalog);
+    byId('filter-brand').addEventListener('change', renderCatalog);
+    byId('only-available').addEventListener('change', renderCatalog);
+    byId('only-new').addEventListener('change', renderCatalog);
+    byId('sortBy').addEventListener('change', renderCatalog);
+    byId('perPage').addEventListener('change', renderCatalog);
+    byId('search').addEventListener('input', renderCatalog);
+
+    render();
+    renderHome();
+    updateCartCount();
+    if(location.hash) navigate(location.hash.slice(1));
+    else navigate('home');
+    </script>
+  </body>
+</html>
